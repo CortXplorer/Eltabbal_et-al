@@ -1,10 +1,10 @@
 function Tabbal_et_al_CSD_group_analysis
 %this function will group different variables for each condition and make
-%comparative group statistics (last edition 10th february 2020)
+%comparative group statistics (Author: EL-Tabbal and Happel July 2020)
 
-path = '/Users/tabbal/Dropbox (OIST)/CorteXexplorer LAB/Data Organized/Hyase_ECM data/Figures';
+path = 'Add where you want to save all figures add your "Dataforgroupanalysishyase.mat in the folder containing the figure folder';
 cd(path)
-cd ..
+cd ..  
 load ('DataforGroupanalysisHYASE.mat');
 UBSSA= UBSSA_HBSSA{1,1};
 HBSSA= UBSSA_HBSSA{1,2};
@@ -67,9 +67,10 @@ for k = 1:size(BF_nonBF_peakBAmatrix{1,1},3);
         subplot(2,2,k);
         title(layers{k});
         errorbar(a,c,colors{i});
-        set(gca, 'xticklabel',{'' '-2BF' '-1Bf' 'BF' '+1BF' '+2BF' ''})
+        xticks([1,2,3,4,5,6,7]);
+        set(gca, 'xticklabel',{'BF-2'  'BF-1'  'BF'  'BF+1'  'BF+2' ''})
+        xlim([0,6]);
         ylabel('Peak amplitude');
-        xlim([0,6])
         legend('Untreated','Hyase' ,'Location','southwest','FontSize',6);
         legend('boxoff');
         hold on
@@ -140,9 +141,10 @@ for k = 1:size(BF_nonBF_peaklatencyBAmatrix{1,1},3);
         subplot(2,2,k);
         title(layers{k});
         errorbar(a,c,colors{i});
-        set(gca, 'xticklabel',{'' '-2BF' '-1Bf' 'BF' '+1BF' '+2BF' ''})
+        xticks([1,2,3,4,5,6,7]);
+        set(gca, 'xticklabel',{'BF-2'  'BF-1'  'BF'  'BF+1'  'BF+2' ''})
+        xlim([0,6]);
         ylabel('Peak latency(s)');
-        xlim([0,6])
         legend('Untreated','Hyase' ,'Location','southwest','FontSize',6);
         legend('boxoff');
         hold on
@@ -211,9 +213,10 @@ for k = 1:size(BF_nonBF_onsetlatencyBAmatrix{1,1},3);
         subplot(2,2,k);
         title(layers{k});
         errorbar(a,c,colors{i});
-        set(gca, 'xticklabel',{'' '-2BF' '-1Bf' 'BF' '+1BF' '+2BF' ''})
+        xticks([1,2,3,4,5,6,7]);
+        set(gca, 'xticklabel',{'BF-2'  'BF-1'  'BF'  'BF+1'  'BF+2' ''})
+        xlim([0,6]);
         ylabel('Onset latency(s)');
-        xlim([0,6])
         legend('Untreated','Hyase' ,'Location','southwest','FontSize',6);
         legend('boxoff');
         hold on
@@ -280,7 +283,8 @@ for k = 1:size(BF_nonBF_RMS_AvgSinkBAmatrix{1,1},3);
         subplot(2,2,k);
         title(layers{k});
         errorbar(a,c,colors{i});
-        set(gca, 'xticklabel',{'' '-2BF' '-1Bf' 'BF' '+1BF' 'SSA' ''})
+        xticks([1,2,3,4,5,6,7]);
+        set(gca, 'xticklabel',{'BF-2'  'BF-1'  'BF'  'BF+1'  'BF+2' ''})
         ylabel('RMS-Avg-Sink amplitude');
         xlim([0,6])
         legend('Untreated','Hyase' ,'Location','southwest','FontSize',6);
@@ -391,7 +395,7 @@ for i = 1: length(combineRMS)
         subplot(1,2,i);
         errorbar(meanRMS,stderror)
         title(namesRMSfigures{i})
-        xticks([1,2,3,4,5]);
+        xticks([1,2,3,4,5,6,7]);
         set(gca, 'xticklabel',{'BF-2'  'BF-1'  'BF'  'BF+1'  'BF+2' ''})
         xlim([0,6]);
         ylabel('RMS amplitude');
