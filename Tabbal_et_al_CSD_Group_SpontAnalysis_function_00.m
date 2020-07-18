@@ -1,4 +1,4 @@
-%% this script reproduce figure 6 A and B in the paper 
+%% this script reproduce figure 6 A , B,C and D in the paper 
 load ('SpontaneousECMDATA.mat');
 UntreatedSpont= struct2cell(SpontaneousData{1,1})';
 HYaseSpont= struct2cell(SpontaneousData{1,2})';
