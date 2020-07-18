@@ -1,8 +1,8 @@
 function Tabbal_et_al_CSD_group_analysis
 %this function will group different variables for each condition and make
-%comparative group statistics (Author: EL-Tabbal and Happel July 2020)
+%comparative group statistics reproduce figure 2 and 3 in the paper (Author: EL-Tabbal and Happel July 2020)
 
-path = 'Add where you want to save all figures add your "Dataforgroupanalysishyase.mat in the folder containing the figure folder';
+path = '/Users/tabbal/Dropbox (OIST)/CorteXexplorer LAB/Data Organized/Hyase_ECM data/Figures'  %Add where you want to save all figures add your "Dataforgroupanalysishyase.mat in the folder containing the figure folder';
 cd(path)
 cd ..  
 load ('DataforGroupanalysisHYASE.mat');
@@ -78,7 +78,7 @@ for k = 1:size(BF_nonBF_peakBAmatrix{1,1},3);
 end
 cd(path)
 saveas(h_fig,FIGURENAME,'fig')
-close all
+%close all
 clear a b c colors i k  FIGURENAME
 
 %% 2nd Peak Latency ( figure not included in the paper but good to see the
@@ -152,7 +152,7 @@ for k = 1:size(BF_nonBF_peaklatencyBAmatrix{1,1},3);
 end
 cd(path)
 saveas(h_fig,FIGURENAME,'fig')
-close all
+%close all
 clear a b c colors i k  FIGURENAME
 %% 3rd Onset latency  ( figure not included in the paper but good to see the
 % effects and compare )
@@ -224,7 +224,7 @@ for k = 1:size(BF_nonBF_onsetlatencyBAmatrix{1,1},3);
 end
 cd(path)
 saveas(h_fig,FIGURENAME,'fig')
-close all
+%close all
 clear a b c colors i k  FIGURENAME
 
 %% 4th RMS_AvgSink This part of the script generate figure 2.A. in the paper 
@@ -294,7 +294,7 @@ for k = 1:size(BF_nonBF_RMS_AvgSinkBAmatrix{1,1},3);
 end
 cd(path)
 saveas(h_fig,FIGURENAME,'fig')
-close all
+%close all
 clear a b c colors i k  FIGURENAME
 cd(path);
 cd ..
@@ -350,7 +350,6 @@ saveas(gcf,'Similarity index at BF RMSampl (July202)','pdf')
 saveas(gcf,'Similarity index at BF RMSampl (July202)','fig')
 %close all
 %% RMS AvRecCSD and RElREsCSD (  This part of the script generate figure 3. in the paper Max, kindly add your script here)
-
 RMS_AvRecCSD = {};  RMS_RelResCSD = {};
 
 RMS_AvRecCSD{1} = nan(size(UBSSA_HBSSA{1},2),5);
@@ -391,7 +390,7 @@ combineRMS = {RMS_AvRecCSD,RMS_RelResCSD} ;
 for i = 1: length(combineRMS)
     for k = 1 :size(combineRMS{i},2)
         meanRMS= nanmean(combineRMS{i}{k},1);
-        stderror = nanstd(combineRMS{i}{k},0,1);
+        stderror = nanstd(combineRMS{i}{k},0,1)/sqrt(size(combineRMS{1}{1},1));
         subplot(1,2,i);
         errorbar(meanRMS,stderror)
         title(namesRMSfigures{i})

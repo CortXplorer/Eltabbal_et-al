@@ -1,6 +1,6 @@
 function Tabbal_et_al_OscillationHyase_at_BF_function00
-%this function will group different variables for each condition and make
-%comparative group statistics last updated on the 10thfeb2020
+%this functiongroup different variables and reproduce figure 4 in the paper
+%
 
 path = '/Users/tabbal/Dropbox (OIST)/CorteXexplorer LAB/Data Organized/Hyase_ECM data/Figures';
 cd(path)
@@ -159,11 +159,11 @@ cd(path)
 legend('Untreated','Hyase')
 set(gcf,'Units','inches');
 saveas(gcf,FIGURENAME,'fig');
-close all 
+%close all 
 %% Ttest for each frequency bin frequencies reproduce figure4B 
 path = '/Users/tabbal/Dropbox (OIST)/CorteXexplorer LAB/Data Organized/Hyase_ECM data/Figures';
 EvokedPSD = load('EVOKEDPSD_10thFeb2020.mat'); EvokedPSD = EvokedPSD.norm_power_spec;
-SpontPSD = load('filter_SpontaneousPSD_10thFEB202.mat'); SpontPSD = SpontPSD.mean_trials_norm_power_spec;
+SpontPSD = load('SpontaneousPSD_10thFEB202.mat'); SpontPSD = SpontPSD.mean_trials_norm_power_spec;
 
 ALLPSD = {EvokedPSD,SpontPSD}; 
 % adding one step to take the logarithm of the normalized spectrum 
@@ -235,7 +235,7 @@ end
 cd(path)
 saveas(gcf,FIGURENAME,'fig');
 saveas(gcf,FIGURENAME,'pdf');
-close all
+%close all
 clear FIGURENAME ci colors Eh Ehvec Eindex  h_fig Ipvec Epvec layer layers f2 Etvalue  meantrials_norm_power_spec norm_power_spec path fig_pos fig_margin freqbin f2
 
 

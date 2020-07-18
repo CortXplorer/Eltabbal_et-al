@@ -1,6 +1,6 @@
 %% This is a script to analyse bivariate/multivariate granger predictive causality
 % this is the singletrial  for data on the BF stimulation  this script will
-% reproduce figure 5 with all panels 
+% reproduce figure 5 with all panels
 %% load LFP data, here the format of the resulting matrix X will be two cell for each coniditon 1st is the untreated
 %seond is the Hyase, in each there will be matrix ( channels x time x
 %trials (animals) )
