@@ -73,7 +73,7 @@ for k = 1:size(BF_nonBF_peakBAmatrix{1,1},3);
         set(gca, 'xticklabel',{'BF-2'  'BF-1'  'BF'  'BF+1'  'BF+2' ''})
         xlim([0,6]);
         ylabel('Peak amplitude');
-        legend('Untreated','Hyase' ,'Location','southwest','FontSize',6);
+        legend('Untreated','Hyase');
         legend('boxoff');
         hold on
     end
@@ -147,7 +147,7 @@ for k = 1:size(BF_nonBF_peaklatencyBAmatrix{1,1},3);
         set(gca, 'xticklabel',{'BF-2'  'BF-1'  'BF'  'BF+1'  'BF+2' ''})
         xlim([0,6]);
         ylabel('Peak latency(s)');
-        legend('Untreated','Hyase' ,'Location','southwest','FontSize',6);
+        legend('Untreated','Hyase');
         legend('boxoff');
         hold on
     end
@@ -219,7 +219,7 @@ for k = 1:size(BF_nonBF_onsetlatencyBAmatrix{1,1},3);
         set(gca, 'xticklabel',{'BF-2'  'BF-1'  'BF'  'BF+1'  'BF+2' ''})
         xlim([0,6]);
         ylabel('Onset latency(s)');
-        legend('Untreated','Hyase' ,'Location','southwest','FontSize',6);
+        legend('Untreated','Hyase');
         legend('boxoff');
         hold on
     end
@@ -289,7 +289,7 @@ for k = 1:size(BF_nonBF_RMS_AvgSinkBAmatrix{1,1},3);
         set(gca, 'xticklabel',{'BF-2'  'BF-1'  'BF'  'BF+1'  'BF+2' ''})
         ylabel('RMS-Avg-Sink amplitude');
         xlim([0,6])
-        legend('Untreated','Hyase' ,'Location','southwest','FontSize',6);
+        legend('Untreated','Hyase');
         legend('boxoff');
         hold on
     end
