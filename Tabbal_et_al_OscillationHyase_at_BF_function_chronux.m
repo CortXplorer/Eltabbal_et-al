@@ -2,7 +2,9 @@ function Tabbal_et_al_OscillationHyase_at_BF_function00
 %this functiongroup different variables and reproduce figure 4 in the paper
 %
 
-path = '/Users/tabbal/Dropbox (OIST)/CorteXexplorer LAB/Data Organized/Hyase_ECM data/Figures';
+%path = '/Users/tabbal/Dropbox (OIST)/CorteXexplorer LAB/Data Organized/Hyase_ECM data/Figures';
+mkdir Figures;
+path = [cd, '\Figures'];
 cd(path)
 cd ..
 load ('DataforGroupanalysisHYASE.mat');
