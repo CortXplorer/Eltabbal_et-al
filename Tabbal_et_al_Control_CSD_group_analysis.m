@@ -69,7 +69,7 @@ for k = 1:size(BF_nonBF_RMS_AvgSinkBAmatrix{1,1},3);
         set(gca, 'xticklabel',{'' '-2BF' '-1Bf' 'BF' '+1BF' 'SSA' ''})
         ylabel('RMS-Avg-Sink amplitude');
         xlim([0,6])
-        legend('Before NaCl','After NaCl' ,'Location','southwest','FontSize',6);
+        legend('Before NaCl','After NaCl');
         legend('boxoff');
         hold on
     end
@@ -135,7 +135,7 @@ for k = 1:size(Avgrec_RelResCSD,2);
         set(gca, 'xticklabel',{'' '-2BF' '-1Bf' 'BF' '+1BF' 'SSA' ''})
         ylabel('RMS-AVrec or RelResCSD');
         xlim([0,6])
-        legend('Before NaCl','After NaCl' ,'Location','southwest','FontSize',6);
+        legend('Before NaCl','After NaCl');
         legend('boxoff');
         hold on
     end
