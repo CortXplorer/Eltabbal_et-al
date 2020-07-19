@@ -4,9 +4,11 @@
 %% load LFP data, here the format of the resulting matrix X will be two cell for each coniditon 1st is the untreated
 %seond is the Hyase, in each there will be matrix ( channels x time x
 %trials (animals) )
-cd('/Users/tabbal/Dropbox (OIST)/CorteXexplorer LAB/Data Organized/Granger causality')
+%cd('/Users/tabbal/Dropbox (OIST)/CorteXexplorer LAB/Data Organized/Granger causality')
+%fig_path = 'C:\Users\TABBAL\Dropbox (OIST)\CorteXexplorer LAB\Data Organized\Granger causality'
 load ('all_animals_BF_singlesink_hyase_10thFeb2020.mat');
-fig_path = 'C:\Users\TABBAL\Dropbox (OIST)\CorteXexplorer LAB\Data Organized\Granger causality'
+mkdir GrangerCausality;
+fig_path = [cd, '\GrangerCausality'];
 
 %% detrending data using the difference method
 nData = all_animals_BF_singlesink_hyase;
