@@ -2,7 +2,9 @@ function Tabbal_et_al_CSD_group_analysis
 %this function will group different variables for each condition and make
 %comparative group statistics reproduce figure 2 and 3 in the paper (Author: EL-Tabbal and Happel July 2020)
 
-path = '/Users/tabbal/Dropbox (OIST)/CorteXexplorer LAB/Data Organized/Hyase_ECM data/Figures'  %Add where you want to save all figures add your "Dataforgroupanalysishyase.mat in the folder containing the figure folder';
+%path = '/Users/tabbal/Dropbox (OIST)/CorteXexplorer LAB/Data Organized/Hyase_ECM data/Figures'  %Add where you want to save all figures add your "Dataforgroupanalysishyase.mat in the folder containing the figure folder';
+mkdir Figures;
+path = [cd, '\Figures'];
 cd(path)
 cd ..  
 load ('DataforGroupanalysisHYASE.mat');
