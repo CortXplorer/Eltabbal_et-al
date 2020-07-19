@@ -12,7 +12,7 @@ For running the code you will need to download the following data from the follo
 * https://www.dropbox.com/s/goxcr5u331ls45t/SpontaneousECMDATA.mat?dl=0
 * https://www.dropbox.com/s/0jpo8qkq3ujyunq/SpontaneousPSD_10thFEB202.mat?dl=0
 
-After downloading all the files you need to download the MVGC_toolbox for granger causality script along with Chronux toolbox for oscillation analysis functions. The downloadable data are the CSD traces used for the analysis and for raw LFP data kindly contact us so we can provide you with it. 
+After downloading all the files you need to download the MVGC_toolbox for granger causality (https://users.sussex.ac.uk/~lionelb/MVGC/html/mvgchelp.html) along with Chronux toolbox for oscillation analysis (http://chronux.org/). The available data are the single-trial traces of the current-source density (CSD) calculated by the laminar local field potential (cf. Happel et al., 2010; J Neurosci). Raw recording files (plx and mat format) can be obtained by the authors by request.  
 
 ## Usage of the code and reproduction of figures:
 the following functions will help reproduce their corresponding figures
