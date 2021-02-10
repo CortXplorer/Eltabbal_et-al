@@ -207,7 +207,7 @@ for layer = 1 : size (EvokedPSD{1,1} ,2);
     [VectSh, crit_p, adj_ci_cvrg, adj_p]=fdr_bh(Spvec{layer},0.05,'pdep','yes');
     [VectEh, crit_p, adj_ci_cvrg, adj_p]=fdr_bh(Epvec{layer},0.05,'pdep','yes');
     
-    subplot(2,2,layer);
+    subplot(1,4,layer);
     plot(f2,Etvalue{layer},'g')
     hold on
     plot(f2,Stvalue{layer},'r')
@@ -233,7 +233,7 @@ for layer = 1 : size (EvokedPSD{1,1} ,2);
     xlim([0 101])
     ylim([-10 10])
     legend('eVokedPSD','SpontaneousPSD','location','southeast')
-end
+    endcl
 cd(path)
 saveas(gcf,FIGURENAME,'fig');
 saveas(gcf,FIGURENAME,'pdf');

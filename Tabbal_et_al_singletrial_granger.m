@@ -35,17 +35,19 @@ clear  i k
 clear sd s ans
 save('SingleTrialBFdetrendeddata','detrendeddata'); save('SingleTrialBFData','nData');
 %% deternded data use (100 ms to 500 ms around stimulus) 
-%avg_trials = 4; 
+%% deternded data use (100 ms to 500 ms around stimulus)
+%avg_trials = 1;
 for cond = 1 :size(detrendeddata,2)
     for anim = 1:size(detrendeddata{1},2)
-        for trial = 1:size(detrendeddata{cond}{anim},3)
-            %k =size(detrendeddata{cond}{anim},3);
-            %r = randi(k,[1,avg_trials]);
-            detrendeddata_monte{cond}{anim}(:,:,trial) = detrendeddata{cond}{anim}(:,100:499,trial); %replace trial with r and add mean or (trial with commenting r and k)  
+        for trial = 1:size(detrendeddata{cond}{anim},3)  %/avg_trials)-1
+%             k =size(detrendeddata{cond}{anim},3);
+%             r = randi(k,[1,avg_trials]);
+             %firstpoint = trial*avg_trials+1; secondpoint = firstpoint+(avg_trials-1) ; 
+            detrendeddata_monte{cond}{anim}(:,:,trial) = detrendeddata{cond}{anim}(:,100:499,trial); %replace trial with r and add mean or (trial with commenting r and k) 100:499
         end
     end
 end
-clear cond anim k r avg_trials r trial
+clear cond anim k r avg_trials r trial detrendeddata
 detrendeddata = detrendeddata_monte;
 %% declaring some variables to be used in the mvgc toolbox
 nvars = 4 % number of channels
@@ -53,12 +55,12 @@ icregmode = 'LWR'; regmode   = 'LWR'; morder    = 'AIC'; momax     = 20; fs = 10
 nobs      = 400;  % number of datapoints
 ntrials   = 0;    % in this case will change
 tstat     = '';
-alpha     = 0.05; mhtc ='FDR' ; acmaxlags=600; fres=100; specm = 'MT'; etests= true; stlags=[]; acorr=true;
-nperms    = 2; % for permutations you dont need it as you will generate model for each animal in different conditions and then compare 
+alpha     = 0.05; mhtc ='FDR' ; acmaxlags=400; fres=100; specm = 'MT'; etests= true; stlags=[]; acorr=true;
+nperms    = 2; % for permutations you dont need it as you will generate model for each animal in different conditions and then compare
 bsize = []; cm =flipud(bone);
 %%
-modelconsistency = [];
 F = cell(size(detrendeddata,2),1)
+F_spec = cell(size(detrendeddata,2),1)
 for anim = 1:size(detrendeddata{1},2)
     for cond = 1 :size(detrendeddata,2)
         X = detrendeddata{cond}{anim};
@@ -91,7 +93,7 @@ for anim = 1:size(detrendeddata{1},2)
         ptic('\n*** tsdata_to_var... ');
         [A,SIG,E] = tsdata_to_var(X,morder,regmode);
         ptoc;
-        assert(~isbad(A),'VAR estimation failed'); %qualtiy check if regression was done or not
+        %assert(~isbad(A),'VAR estimation failed'); %qualtiy check if regression was done or not
         
         ptic('*** var_to_autocov... ');
         [G,info] = var_to_autocov(A,SIG,acmaxlags);
@@ -99,43 +101,7 @@ for anim = 1:size(detrendeddata{1},2)
         
         var_info(info,true); % Report results and check for errors.
         
-        %% checking the consistency  of the model using whitness test and model consistency
-        % Check that residuals are white (Durbin-Watson test).
-        
-        [dw,dwpval] = whiteness(X,E);
-        fprintf('\nDurbin-Watson statistics =\n'); disp(dw);
-        dwsig = significance(dwpval,alpha,mhtc); % significance adjusted for multiple hypotheses
-        notwhite = find(dwsig);
-        if isempty(notwhite)
-            fprintf('all residuals are white by Durbin-Watson test at significance %g\n',alpha);
-        else
-            fprintf(2,'WARNING: autocorrelated residuals at significance %g for variable(s): %s\n',alpha,num2str(notwhite));
-        end
-        
-        % Check R^2 stats.
-        
-        [~,RSQADJ] = rsquared(X,E);
-        fprintf('\nRSQ (adjusted) =\n'); disp(RSQADJ);
-        rsqthreshold = 0.3; % like GCCA
-        badqsq = find(RSQADJ < rsqthreshold);
-        if isempty(badqsq)
-            fprintf('adjusted r-squares OK: > %g%% of variance is accounted for by the model\n',100*rsqthreshold);
-        else
-            fprintf(2,'WARNING: low adjusted r-square values (< %g) for variable(s): %s\n',rsqthreshold,num2str(badqsq));
-        end
-        
-        % Check model consistency (ie. proportion of correlation structure of the data
-        % accounted for by the model).
-        
-        cons = 100*consistency(X,E); % percent
-        modelconsistency(anim) = cons; 
-        fprintf('\nmodel consistency = %.0f%%\n',cons);
-        consthreshold = 80;          % like GCCA
-        if cons > consthreshold
-            fprintf('consistency OK: > %g%%\n',consthreshold);
-        else
-            fprintf(2,'WARNING: low consistency (< %g%%)\n',consthreshold);
-        end
+
         %% getting the pairwise granger causality of the model
         
         ptic('*** autocov_to_pwcgc... ');
@@ -143,10 +109,149 @@ for anim = 1:size(detrendeddata{1},2)
         ptoc;
         % Check for failed GC calculation
         assert(~isbad(F{cond}{anim},false),'GC calculation failed');
+        %% spectral
+        % Calculate spectral pairwise-conditional causalities at given frequency
+        % resolution - again, this only requires the autocovariance sequence.
+        
+        ptic('\n*** autocov_to_spwcgc... ');
+        F_spec{cond}{anim} = autocov_to_spwcgc(G,fres);
+        ptoc;
+        
+        % Check for failed spectral GC calculation
+        
+        assert(~isbad(F_spec{cond}{anim},false),'spectral GC calculation failed');
+        
+        % Plot spectral causal graph.
+        
+        figure(3); clf;
+        plot_spw(F_spec{cond}{anim},fs);
+        
+        %% Granger causality calculation: frequency domain -> time-domain  (<mvgc_schema.html#3 |A15|>)
+        
+        % Check that spectral causalities average (integrate) to time-domain
+        % causalities, as they should according to theory.
+        
+        fprintf('\nchecking that frequency-domain GC integrates to time-domain GC... \n');
+        Fint = smvgc_to_mvgc(F_spec{cond}{anim}); % integrate spectral MVGCs
+        mad = maxabs(F{cond}{anim}-Fint);
+        madthreshold = 1e-5;
+        if mad < madthreshold
+            fprintf('maximum absolute difference OK: = %.2e (< %.2e)\n',mad,madthreshold);
+        else
+            fprintf(2,'WARNING: high maximum absolute difference = %e.2 (> %.2e)\n',mad,madthreshold);
+        end
+        %
     end
     
     
 end
+%%
+x = 1:101; colors = {'b','r'}; figure; 
+for cond = 1:size(F_spec,1)
+    for anim = 1:size(F_spec{cond},2)
+        lateinfra_earlyinfra(cond,:,anim) = (F_spec{cond}{anim}(1,2,:));
+        lateinfra_gran(cond,:,anim) = (F_spec{cond}{anim}(3,2,:));
+        lateinfra_supra(cond,:,anim) = (F_spec{cond}{anim}(4,2,:));
+        
+        earlyinfra_supra(cond,:,anim) = (F_spec{cond}{anim}(4,1,:));
+        earlyinfra_gran(cond,:,anim) = (F_spec{cond}{anim}(3,1,:));
+        earlyinfra_lateinfra(cond,:,anim) = (F_spec{cond}{anim}(2,1,:));
+        
+        supra_earlyinfra(cond,:,anim) = (F_spec{cond}{anim}(1,4,:));
+        supra_lateinfra(cond,:,anim) = (F_spec{cond}{anim}(2,4,:));
+        supra_granular(cond,:,anim) = (F_spec{cond}{anim}(3,4,:));
+        
+        gran_earlyinfra(cond,:,anim) = (F_spec{cond}{anim}(1,3,:));
+        gran_lateinfra(cond,:,anim) = (F_spec{cond}{anim}(2,3,:));
+        gran_supra(cond,:,anim) = (F_spec{cond}{anim}(4,3,:));
+        
+    end
+    subplot(3,4,1)
+    y = mean(lateinfra_earlyinfra(cond,:,:),3);
+    sem = std(lateinfra_earlyinfra(cond,:,:),0,3)/sqrt(9);
+    shadedErrorBar(x,y,sem,colors{cond},1);
+    title('lateinfra-earlyinfra')
+    hold on 
+    
+    subplot(3,4,2)
+    y = mean(lateinfra_gran(cond,:,:),3);
+    sem = std(lateinfra_gran(cond,:,:),0,3)/sqrt(9);
+    shadedErrorBar(x,y,sem,colors{cond},1);
+    title('lateinfra-gran')
+    hold on 
+    
+    subplot(3,4,3)
+    y = mean(lateinfra_supra(cond,:,:),3);
+    sem = std(lateinfra_supra(cond,:,:),0,3)/sqrt(9);
+    shadedErrorBar(x,y,sem,colors{cond},1);
+    title('lateinfra-supra')
+    hold on 
+    
+        subplot(3,4,4)
+    y = mean(earlyinfra_supra(cond,:,:),3);
+    sem = std(earlyinfra_supra(cond,:,:),0,3)/sqrt(9);
+    shadedErrorBar(x,y,sem,colors{cond},1);
+     title('earlyinfra-supra')
+    hold on 
+    
+        subplot(3,4,5)
+    y = mean(earlyinfra_gran(cond,:,:),3);
+    sem = std(earlyinfra_gran(cond,:,:),0,3)/sqrt(9);
+    shadedErrorBar(x,y,sem,colors{cond},1);
+     title('earlyinfra-gran')
+    hold on 
+    
+        subplot(3,4,6)
+    y = mean(earlyinfra_lateinfra(cond,:,:),3);
+    sem = std(earlyinfra_lateinfra(cond,:,:),0,3)/sqrt(9);
+    shadedErrorBar(x,y,sem,colors{cond},1);
+         title('earlyinfra-lateinfra')
+
+    hold on 
+        subplot(3,4,7)
+    y = mean(supra_earlyinfra(cond,:,:),3);
+    sem = std(supra_earlyinfra(cond,:,:),0,3)/sqrt(9);
+    shadedErrorBar(x,y,sem,colors{cond},1);
+             title('supra-earlyinfra')
+    hold on 
+        subplot(3,4,8)
+    y = mean(supra_lateinfra(cond,:,:),3);
+    sem = std(supra_lateinfra(cond,:,:),0,3)/sqrt(9);
+    shadedErrorBar(x,y,sem,colors{cond},1);
+                 title('supra-lateinfra')
+
+    hold on 
+        subplot(3,4,9)
+    y = mean(supra_granular(cond,:,:),3);
+    sem = std(supra_granular(cond,:,:),0,3)/sqrt(9);
+    shadedErrorBar(x,y,sem,colors{cond},1);
+                     title('supra-granular')
+
+    hold on 
+        subplot(3,4,10)
+    y = mean(gran_earlyinfra(cond,:,:),3);
+    sem = std(gran_earlyinfra(cond,:,:),0,3)/sqrt(9);
+    shadedErrorBar(x,y,sem,colors{cond},1);
+     title('gran-earlyinfra')
+
+    hold on 
+        subplot(3,4,11)
+    y = mean(gran_lateinfra(cond,:,:),3);
+    sem = std(gran_lateinfra(cond,:,:),0,3)/sqrt(9);
+    shadedErrorBar(x,y,sem,colors{cond},1);
+     title('gran-lateinfra')
+    hold on 
+        subplot(3,4,12)
+    y = mean(gran_supra(cond,:,:),3);
+    sem = std(gran_supra(cond,:,:),0,3)/sqrt(9);
+    shadedErrorBar(x,y,sem,colors{cond},1);
+    title('gran-supra')
+    hold on 
+    
+end
+
+
+%%
 G_matrix = {}
 for cond = 1:size(F,1)
     for anim = 1:size(F{1},2)
@@ -169,6 +274,8 @@ for cond = 1 :size(G_matrix,2)
         G_matrix_prism{cond}(:,anim)= aa;
     end
 end
+
+save('G_matrix_prism_23Nov2020','G_matrix_prism')
 %%
 condname = {'Conditional pairwise GC before Hyase','Conditional pairwise GC after Hyase'};
 netowrkname = {'G-causal network graph before Hyase','G-causal network graph after Hyase'};
@@ -183,38 +290,38 @@ for cond = 1:size(F,1)
     x = [2 1 1.5 2]; y = [1 2 3 4]; z = [0 0 0 0];
     pair{1} = [2,3,4]; pair{2}=[1,3,4];pair{3}= [1,2,4]; pair{4}= [1,2,3];
     weight{1}= a(1:3);weight{2}= a(4:6);weight{3}= a(7:9);weight{4}= a(10:12);
-    names = {'Layer VI','Layer Vb','Layer III/IV','Layer I/II'};
+    names = {'Layer Vb','Layer VI','Layer III/IV','Layer I/II'};
     %k(cond)= subplot(3,2,cond)
     fig1 = figure()
     
     G = digraph(s,t,a,names);
     h = plot(G,'XData',x,'YData',y,'ZData',z,'NodeFontSize',16,'MarkerSize',10,'NodeColor',[0 0 0]);view(2)
     set(gca,'visible','off')
-    for i = 1 :4 
+    for i = 1 :4
         maxweight(i) = max(weight{i});
     end
     maxweigtall = max(maxweight);
-   for i = 1 :4 
+    for i = 1 :4
         weight{i} = weight{i}./maxweigtall;
-   end
+    end
     for i = 1:4
         for k = 1:3
             s1 = i; s2 = pair{i}(k); w = weight{i}(k)
             count = count+1
             if ismember(count,indb)
-                highlight(h,[s1 s2],'EdgeColor','r','LineWidth',13*w);
+                highlight(h,[s1 s2],'EdgeColor','r','LineWidth',12*w);
             else
-                highlight(h,[s1 s2],'EdgeColor','k','LineWidth',13*w);
+                highlight(h,[s1 s2],'EdgeColor','k','LineWidth',12*w);
             end
         end
     end
     annotation(fig1,'textbox',...
-    [0.196969696969697 0.834791059280854 0.633608815426998 0.0505344995140912],...
-    'String',netowrkname{cond},...
-    'FontWeight','bold',...
-    'FontSize',12,...
-    'FitBoxToText','off',...
-    'EdgeColor','none');
+        [0.196969696969697 0.834791059280854 0.633608815426998 0.0505344995140912],...
+        'String',netowrkname{cond},...
+        'FontWeight','bold',...
+        'FontSize',12,...
+        'FitBoxToText','off',...
+        'EdgeColor','none');
     %k(cond+2)=subplot(3,2,cond+2)
     figure()
     x = repmat(1:size(p,2),size(p,1),1); % generate x-coordinates
@@ -223,7 +330,7 @@ for cond = 1:size(F,1)
     t = num2cell(updatedF); % extact values into cells
     t = cellfun(@num2str, t, 'UniformOutput', false); % convert to string
     colormap(cm);
-    imagesc(updatedF); 
+    imagesc(updatedF);
     caxis([0,0.2]);
     title(condname{cond});
     colorbar()
